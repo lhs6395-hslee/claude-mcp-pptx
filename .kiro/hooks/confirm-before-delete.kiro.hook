@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "파일 삭제 전 확인",
+  "description": "파일을 삭제하려고 할 때 사유를 설명하고 사용자 승인을 요청합니다",
+  "version": "1",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": [
+      ".*[Dd]elete.*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "파일 삭제 작업이 감지되었습니다. CLAUDE.md 규칙에 따라 파일 삭제는 금지되어 있습니다. 삭제하려는 이유를 사용자에게 설명하고 명시적인 승인을 받으세요. 승인 없이는 절대 삭제를 진행하지 마세요."
+  }
+}

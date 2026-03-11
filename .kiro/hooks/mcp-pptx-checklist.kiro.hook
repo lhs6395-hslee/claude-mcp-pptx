@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "MCP PPTX 도구 사용 전 체크",
+  "description": "create_presentation 도구 사용 전 LAYOUTS.md 확인, 파일 삭제 금지, sections 파라미터 완성 여부를 자동으로 체크",
+  "version": "1",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": [
+      ".*create_presentation.*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "🚨 MCP 도구 사용 전 필수 체크리스트:\n\n1. LAYOUTS.md 확인: 사용할 레이아웃의 정확한 데이터 형식을 LAYOUTS.md에서 확인했는가?\n   - bento_grid: main, sub1, sub2\n   - icon_grid: items[{icon, title, desc}]\n   - numbered_list: items[{title, desc}]\n   - full_image: image_path, caption\n   \n2. 파일 수정 방식: 기존 파일이 있다면 삭제하지 말고 수정하는가?\n   - ❌ deleteFile 후 재생성\n   - ✅ Python 스크립트로 부분 수정 또는 누적 모드\n\n3. sections 파라미터: 완전히 작성했는가?\n   - 최소 1개 섹션, 1개 슬라이드 필요\n   - 빈 배열 또는 중간에 멈춤 금지\n\n위 체크리스트를 모두 확인했으면 도구를 호출하세요. 확인하지 않았다면 먼저 확인 후 호출하세요."
+  }
+}

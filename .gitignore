@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+results/
+temp_rm_sec/
+.DS_Store
+debug/
