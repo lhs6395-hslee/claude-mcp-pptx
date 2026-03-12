@@ -226,20 +226,16 @@ def create_presentation(
         IDX_TOC = 1
         IDX_BODY_SRC = 7
 
-        # 기존 파일이 있으면 열기 (누적 모드), 없으면 템플릿 복사
+        # 기존 파일이 있으면 삭제 후 새로 생성 (중복 슬라이드 방지)
         if os.path.exists(OUTPUT_FILE):
-            # 누적 모드: 기존 파일 열기
-            print(f"[APPEND MODE] Opening existing file: {OUTPUT_FILE}", file=sys.stderr)
-            prs = Presentation(OUTPUT_FILE)
-            is_append_mode = True
-            print(f"[APPEND MODE] Existing slides: {len(prs.slides)}", file=sys.stderr)
+            os.remove(OUTPUT_FILE)
+            print(f"[NEW MODE] Removed existing file, creating fresh: {OUTPUT_FILE}", file=sys.stderr)
         else:
-            # 새 파일 모드: 템플릿 복사 → 섹션 제거 → 열기
             print(f"[NEW MODE] Creating new file: {OUTPUT_FILE}", file=sys.stderr)
-            shutil.copy(TEMPLATE_FILE, OUTPUT_FILE)
-            _remove_all_sections(OUTPUT_FILE)
-            prs = Presentation(OUTPUT_FILE)
-            is_append_mode = False
+        shutil.copy(TEMPLATE_FILE, OUTPUT_FILE)
+        _remove_all_sections(OUTPUT_FILE)
+        prs = Presentation(OUTPUT_FILE)
+        is_append_mode = False
 
         if len(prs.slides) <= IDX_BODY_SRC:
             return "ERROR: Template has insufficient slides"
@@ -661,6 +657,64 @@ def insert_slide(
         sys.stdout = original_stdout
         os.chdir(original_cwd)
 
+
+
+@mcp.tool()
+def export_pdf(
+    output_name: str,
+    pdf_name: str | None = None,
+) -> str:
+    """Export an existing presentation to PDF using Microsoft PowerPoint (macOS).
+
+    Args:
+        output_name: Filename without extension of the source .pptx (e.g. "my_presentation").
+        pdf_name: Output PDF filename without extension. Defaults to same as output_name.
+
+    Returns:
+        Absolute path to the generated .pdf file, or an error message.
+    """
+    import subprocess
+
+    original_cwd = os.getcwd()
+    os.chdir(PROJECT_ROOT)
+
+    try:
+        pptx_path = os.path.abspath(f"results/{output_name}.pptx")
+        if not os.path.exists(pptx_path):
+            return f"ERROR: File not found: {pptx_path}"
+
+        if not pdf_name:
+            pdf_name = output_name
+        pdf_path = os.path.abspath(f"results/{pdf_name}.pdf")
+
+        # AppleScript로 PowerPoint에서 PDF 내보내기
+        script = f'''
+tell application "Microsoft PowerPoint"
+    set pptFile to POSIX file "{pptx_path}"
+    set pdfFile to POSIX file "{pdf_path}"
+    open pptFile
+    set theDoc to active presentation
+    save theDoc in pdfFile as save as PDF
+    close theDoc saving no
+end tell
+'''
+        result = subprocess.run(
+            ["osascript", "-e", script],
+            capture_output=True, text=True, timeout=120
+        )
+
+        if result.returncode != 0:
+            err = result.stderr.strip()
+            return f"ERROR: AppleScript failed — {err}"
+
+        if not os.path.exists(pdf_path):
+            return f"ERROR: PDF not created at {pdf_path}"
+
+        size_kb = os.path.getsize(pdf_path) // 1024
+        return f"✅ PDF exported: {pdf_path} ({size_kb} KB)"
+
+    finally:
+        os.chdir(original_cwd)
 
 
 if __name__ == "__main__":
