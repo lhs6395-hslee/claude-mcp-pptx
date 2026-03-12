@@ -4,3 +4,5 @@ results/
 temp_rm_sec/
 .DS_Store
 debug/
+rayhli-ssts_*.py
+tmp_icons/

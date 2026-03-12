@@ -715,7 +715,7 @@ def render_exec_summary(slide, data):
 
     # 원본 p9 측정값 기반 상수
     lbl_h = Inches(0.280); content_gap = Inches(0.080)
-    bottom_pad = Inches(0.120); bullet_plain_h = Inches(0.500); bullet_arrow_h = Inches(0.290)
+    bottom_pad = Inches(0.120); bullet_plain_h = Inches(0.440); bullet_arrow_h = Inches(0.290)
     inline_h = Inches(0.946); sec_gap = Inches(0.150); accent_bar_w = Inches(0.080)
     # 타입별 badge top padding (원본 p9 실측):
     #   inline/bullet_plain: badge y-offset = 0.120" (shape[5] y=2.82-2.7=0.12, shape[8] y=3.866-3.746=0.12)
@@ -826,7 +826,7 @@ def render_exec_summary(slide, data):
                 p3 = tf3.paragraphs[0]; p3.text = hdr_line
                 p3.font.name = FONTS["BODY_TEXT"]; p3.font.size = Pt(11); p3.font.bold = True  # 원본: 11pt bold
                 p3.font.color.rgb = COLORS["DARK_GRAY"]  # 원본: 212121
-                p3.space_after = Pt(4)  # heading과 body 간격
+                p3.space_after = Pt(0)  # heading과 body 간격
                 if bdy_line.strip():
                     p3b = tf3.add_paragraph(); p3b.text = bdy_line
                     p3b.font.name = FONTS["BODY_TEXT"]; p3b.font.size = Pt(9); p3b.font.bold = False  # 원본: 9pt
